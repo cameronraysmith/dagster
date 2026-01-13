@@ -2,30 +2,27 @@
 
 import * as Types from '../../../graphql/types';
 
-export type AssetCheckTableFragment = {
-  __typename: 'AssetCheck';
-  name: string;
-  description: string | null;
-  canExecuteIndividually: Types.AssetCheckCanExecuteIndividually;
-  blocking: boolean;
-  jobNames: Array<string>;
-  automationCondition: {
-    __typename: 'AutomationCondition';
-    label: string | null;
-    expandedLabel: Array<string>;
-  } | null;
-  executionForLatestMaterialization: {
+export type AssetCheckPartitionDetailQueryVariables = Types.Exact<{
+  assetKey: Types.AssetKeyInput;
+  checkName: Types.Scalars['String']['input'];
+  partitionKey: Types.Scalars['String']['input'];
+}>;
+
+export type AssetCheckPartitionDetailQuery = {
+  __typename: 'Query';
+  assetCheckExecutions: Array<{
     __typename: 'AssetCheckExecution';
     id: string;
     runId: string;
     status: Types.AssetCheckExecutionResolvedStatus;
-    stepKey: string | null;
     timestamp: number;
+    stepKey: string | null;
     evaluation: {
       __typename: 'AssetCheckEvaluation';
-      severity: Types.AssetCheckSeverity;
       timestamp: number;
+      severity: Types.AssetCheckSeverity;
       description: string | null;
+      success: boolean;
       partition: string | null;
       targetMaterialization: {
         __typename: 'AssetCheckEvaluationTargetMaterializationData';
@@ -186,5 +183,7 @@ export type AssetCheckTableFragment = {
         | {__typename: 'UrlMetadataEntry'; url: string; label: string; description: string | null}
       >;
     } | null;
-  } | null;
+  }>;
 };
+
+export const AssetCheckPartitionDetailQueryVersion = '160d71db0b3d2837405b9dd16e6806b5ff012cb59b45a806968e3c27ed39c038';
