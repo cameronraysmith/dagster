@@ -85,7 +85,8 @@ function findTokenTrigger(
 }
 
 /**
- * Build a hint suggestion with custom rendering
+ * Build a hint suggestion with custom rendering using CSS classes
+ * Follows YAML mode pattern from codemirror-yaml/mode.tsx
  */
 function buildHint(
   token: JsonHintToken,
@@ -103,8 +104,7 @@ function buildHint(
     to,
     render: (el: Element) => {
       const container = document.createElement('div');
-      container.style.padding = '4px 8px';
-      container.style.minWidth = '280px';
+      container.className = 'cm-json-hint';
 
       // Token name row
       const nameRow = document.createElement('div');
@@ -113,9 +113,7 @@ function buildHint(
       nameRow.style.gap = '8px';
 
       const name = document.createElement('span');
-      name.style.fontWeight = '600';
-      name.style.fontFamily = 'monospace';
-      name.style.fontSize = '13px';
+      name.className = 'cm-json-hint-name';
       name.textContent = `{{${tokenName}}}`;
       nameRow.appendChild(name);
 
@@ -124,11 +122,7 @@ function buildHint(
       // Description
       if (token.description) {
         const desc = document.createElement('div');
-        desc.style.fontSize = '12px';
-        desc.style.opacity = '0.7';
-        desc.style.marginTop = '2px';
-        desc.style.whiteSpace = 'normal';
-        desc.style.maxWidth = '320px';
+        desc.className = 'cm-json-hint-description';
         desc.textContent =
           token.description.length > 80
             ? token.description.slice(0, 77) + '...'
@@ -139,10 +133,7 @@ function buildHint(
       // Example value
       if (token.example) {
         const example = document.createElement('div');
-        example.style.fontSize = '11px';
-        example.style.opacity = '0.5';
-        example.style.fontStyle = 'italic';
-        example.style.marginTop = '2px';
+        example.className = 'cm-json-hint-example';
         example.textContent = `Example: ${token.example}`;
         container.appendChild(example);
       }
