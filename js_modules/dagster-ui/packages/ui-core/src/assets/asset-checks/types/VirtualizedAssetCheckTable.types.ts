@@ -187,4 +187,55 @@ export type AssetCheckTableFragment = {
       >;
     } | null;
   } | null;
+  partitionDefinition: {
+    __typename: 'PartitionDefinition';
+    name: string | null;
+    description: string;
+  } | null;
+  partitionStatuses:
+    | {
+        __typename: 'AssetCheckDefaultPartitionStatuses';
+        succeededPartitions: Array<string>;
+        failedPartitions: Array<string>;
+        inProgressPartitions: Array<string>;
+        skippedPartitions: Array<string>;
+        executionFailedPartitions: Array<string>;
+      }
+    | {
+        __typename: 'AssetCheckMultiPartitionStatuses';
+        primaryDimensionName: string;
+        ranges: Array<{
+          __typename: 'AssetCheckMultiPartitionRangeStatuses';
+          primaryDimStartKey: string;
+          primaryDimEndKey: string;
+          secondaryDim:
+            | {
+                __typename: 'AssetCheckDefaultPartitionStatuses';
+                succeededPartitions: Array<string>;
+                failedPartitions: Array<string>;
+                inProgressPartitions: Array<string>;
+                skippedPartitions: Array<string>;
+                executionFailedPartitions: Array<string>;
+              }
+            | {
+                __typename: 'AssetCheckTimePartitionStatuses';
+                ranges: Array<{
+                  __typename: 'AssetCheckTimePartitionRangeStatus';
+                  startKey: string;
+                  endKey: string;
+                  status: Types.AssetCheckPartitionRangeStatus;
+                }>;
+              };
+        }>;
+      }
+    | {
+        __typename: 'AssetCheckTimePartitionStatuses';
+        ranges: Array<{
+          __typename: 'AssetCheckTimePartitionRangeStatus';
+          startKey: string;
+          endKey: string;
+          status: Types.AssetCheckPartitionRangeStatus;
+        }>;
+      }
+    | null;
 };

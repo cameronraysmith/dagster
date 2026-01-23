@@ -11,6 +11,7 @@ import {
 import {Link} from 'react-router-dom';
 
 import {ChecksSummaryPopover} from './AssetChecksStatusSummary';
+import {getCheckPartitionStats} from './util';
 import {assertUnreachable} from '../../app/Util';
 import {AssetCheckLiveFragment} from '../../asset-data/types/AssetBaseDataProvider.types';
 import {
@@ -144,13 +145,18 @@ export const CheckStatusRow = ({
 
 export const AssetCheckStatusTag = ({
   execution,
+  check,
 }: {
   execution:
     | (Pick<AssetCheckExecution, 'runId' | 'status' | 'timestamp' | 'stepKey'> & {
         evaluation: Pick<AssetCheckEvaluation, 'severity'> | null;
       })
     | null;
+  check?: AssetCheckLiveFragment;
 }) => {
+  // Get partition stats if available
+  const partitionStats = check ? getCheckPartitionStats(check) : null;
+
   // Note: this uses BaseTag for a "grayer" style than the default tag intent
   if (!execution) {
     return (
@@ -209,6 +215,40 @@ export const AssetCheckStatusTag = ({
     }
   };
 
+  // If partitioned, show partition breakdown in tooltip
+  const hasPartitionStats =
+    partitionStats &&
+    (partitionStats.numSucceeded > 0 ||
+      partitionStats.numFailed > 0 ||
+      partitionStats.numExecutionFailed > 0 ||
+      partitionStats.numInProgress > 0 ||
+      partitionStats.numSkipped > 0);
+
+  const tagWithPopover =
+    hasPartitionStats && partitionStats ? (
+      <Popover
+        content={
+          <Box flex={{direction: 'column', gap: 4}} padding={{vertical: 8, horizontal: 12}}>
+            {partitionStats.numSucceeded > 0 && <div>{partitionStats.numSucceeded} succeeded</div>}
+            {partitionStats.numFailed > 0 && <div>{partitionStats.numFailed} failed</div>}
+            {partitionStats.numExecutionFailed > 0 && (
+              <div>{partitionStats.numExecutionFailed} execution failed</div>
+            )}
+            {partitionStats.numInProgress > 0 && (
+              <div>{partitionStats.numInProgress} in progress</div>
+            )}
+            {partitionStats.numSkipped > 0 && <div>{partitionStats.numSkipped} skipped</div>}
+          </Box>
+        }
+        position="top"
+        interactionKind="hover"
+      >
+        {renderTag()}
+      </Popover>
+    ) : (
+      renderTag()
+    );
+
   return (
     <TagActionsPopover
       data={{key: '', value: ''}}
@@ -222,7 +262,7 @@ export const AssetCheckStatusTag = ({
         },
       ]}
     >
-      {renderTag()}
+      {tagWithPopover}
     </TagActionsPopover>
   );
 };
